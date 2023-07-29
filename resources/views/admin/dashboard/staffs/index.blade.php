@@ -356,6 +356,7 @@
 
                                         <th class="min-w-125px">{{ translate('staffTranslation.Name') }}</th>
                                         <th class="min-w-125px">{{ translate('staffTranslation.Email') }}</th>
+                                        <th class="min-w-125px">{{ translate('staffTranslation.Phone Number') }}</th>
 
                                         <th class="min-w-125px">{{ translate('staffTranslation.role') }}</th>
                                         <th class="text-end min-w-100px px-10">
@@ -381,10 +382,16 @@
                                             <!--end::Resource=-->
                                             <!--begin::Role=-->
 
-                                            <td>{{ $staff->name }}</td>
+                                            <td>
+                                                <a
+                                                    @can(READ_STAFF_PERMISSION) href="{{ route('staffs.show', $staff->id) }}" @endcan
+                                                    class="text-gray-800 text-hover-primary">{{ $staff->name }}
+                                                </a>
+                                            </td>
                                             <!--end::Role=-->
                                             <!--begin::Joined-->
                                             <td>{{ $staff->email }}</td>
+                                            <td>{{ $staff->phone }}</td>
 
 
 
