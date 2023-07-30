@@ -1,29 +1,27 @@
 <?php
 
-
 use App\Http\Controllers\FeatureFlagController;
 use App\Http\Controllers\Panel\Admin\AdminController;
+use App\Http\Controllers\Panel\Admin\DebtController;
 use App\Http\Controllers\Panel\Admin\EmployeeController;
 use App\Http\Controllers\Panel\Admin\LanguageController;
-use App\Http\Controllers\Panel\Admin\SliderController;
-use App\Http\Controllers\Panel\Admin\UserController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StaffController;
 use Illuminate\Support\Facades\Route;
 
 /*
-  |--------------------------------------------------------------------------
-  | Admin Routes
-  |--------------------------------------------------------------------------
-  |
-  | Here is where you can register admin routes for your application. These
-  | routes are loaded by the RouteServiceProvider within a group which
-  | contains the "web" middleware group. Now create something great!
-  |
+|--------------------------------------------------------------------------
+| Admin Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register admin routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
  */
 
-Route::prefix('dashboard/admin/')->group(static function () {
+Route::prefix('dashboard/admin/')->group(function () {
     Route::middleware(['auth', 'verified'])->group(static function () {
         Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
@@ -33,8 +31,18 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::resource('roles', RoleController::class);
         Route::resource('staffs', StaffController::class);
         Route::post('/staffs/deleteSelected', [StaffController::class, 'deleteSelected'])->name('staffs.deleteSelected');
-        Route::resource('plans', PlanController::class);
         Route::resource('employees', EmployeeController::class);
         Route::post('/employees/deleteSelected', [EmployeeController::class, 'deleteSelected'])->name('employees.deleteSelected');
+
+        Route::prefix('debts')->group(function () {
+            Route::post('/debts/store_on_us',  [DebtController::class, 'store_on_us'])->name('debts.store_on_us');
+            Route::post('/debts/store_for_us',  [DebtController::class, 'store_for_us'])->name('debts.store_for_us');
+            Route::get('/debts/show/{id}',  [DebtController::class, 'show'])->name('debts.show');
+            Route::get('/debts/show',  [DebtController::class, 'destroy'])->name('debts.destroy');
+            Route::get('/onUs', [DebtController::class, 'debtsOnUs'])->name('debts.onUs');
+            Route::get('/forUs', [DebtController::class, 'debtsForUs'])->name('debts.forUs');
+            Route::post('/verifiedDebt/{id}', [DebtController::class, 'verifiedDebt'])->name('debts.verifiedDebt');
+            Route::post('/deleteSelected', [DebtController::class, 'deleteSelected'])->name('debts.deleteSelected');
+        });
     });
 });
