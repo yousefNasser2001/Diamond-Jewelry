@@ -3,29 +3,29 @@
 namespace App\Http\Controllers\Panel\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Deposit;
+use App\Models\GoldDelar;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class DepositController extends Controller
+class GoldDelarController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('permission:' . DEPOSITS_PERMISSION)->only('index');
-        $this->middleware('permission:' . CREATE_DEPOSIT_PERMISSION)->only('create', 'store');
-        $this->middleware('permission:' . READ_DEPOSIT_PERMISSION)->only('show');
-        $this->middleware('permission:' . UPDATE_DEPOSIT_PERMISSION)->only('edit', 'update');
-        $this->middleware('permission:' . DELETE_DEPOSIT_PERMISSION)->only('destroy');
+        $this->middleware('permission:' . GOLD_DELARS_PERMISSION)->only('index');
+        $this->middleware('permission:' . CREAT_GOLD_DELAR_PERMISSION)->only('create', 'store');
+        $this->middleware('permission:' . READ_GOLD_DELAR_PERMISSION)->only('show');
+        $this->middleware('permission:' . UPDATE_GOLD_DELAR_PERMISSION)->only('edit', 'update');
+        $this->middleware('permission:' . DELETE_GOLD_DELAR_PERMISSION)->only('destroy');
     }
 
     public function index()
     {
-        $deposits = Deposit::all();
-        return view('admin.dashboard.deposits.index', compact('deposits'));
+        $goldDelars = GoldDelar::all();
+        return view('admin.dashboard.gold_delars.index', compact('goldDelars'));
     }
 
     public function create()
@@ -36,9 +36,10 @@ class DepositController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric',
-            'notes' => 'nullable|string',
-            'currency_id' => 'required|integer|exists:currencies,id',
+            'name' => 'required|string',
+            'total_weight' => 'nullable|numeric',
+            'total_workmanship' => 'nullable|numeric',
+            'phone_number' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -46,11 +47,11 @@ class DepositController extends Controller
         }
 
         try {
-            Deposit::create([
-                'amount' => $request->amount,
-                'deposit_date' => now(),
-                'notes' => $request?->notes,
-                'currency_id' => $request->currency_id,
+            GoldDelar::create([
+                'name' => $request->name,
+                'total_weight' => $request->total_weight,
+                'total_workmanship' => $request->total_workmanship,
+                'phone_number' => $request->phone_number,
             ]);
             flash(translate('messages.Added'))->success();
 
@@ -62,8 +63,9 @@ class DepositController extends Controller
 
     public function show($id)
     {
-        $deposit = Deposit::find($id);
-        return view('admin.dashboard.deposits.show', compact('deposit'));
+        $gold_delar = GoldDelar::find($id);
+        $transactions = $gold_delar->goldTransactions;
+        return view('admin.dashboard.gold_delars.show', compact('gold_delar', 'transactions'));
     }
 
     public function edit($id)
@@ -74,10 +76,10 @@ class DepositController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'amount' => 'required|numeric',
-            'notes' => 'nullable|string',
-            'currency_id' => 'required|integer|exists:currencies,id',
-
+            'name' => 'required|string',
+            'total_weight' => 'nullable|numeric',
+            'total_workmanship' => 'nullable|numeric',
+            'phone_number' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -85,11 +87,12 @@ class DepositController extends Controller
         }
 
         try {
-            $deposit = Deposit::findOrFail($id);
-            $deposit->amount = $request->amount;
-            $deposit->notes = $request->notes;
-            $deposit->currency_id = $request->currency_id;
-            $deposit->save();
+            $delar = GoldDelar::findOrFail($id);
+            $delar->name = $request->name;
+            $delar->total_weight = $request->total_weight;
+            $delar->total_workmanship = $request->total_workmanship;
+            $delar->phone_number = $request->phone_number;
+            $delar->save();
 
             flash(translate('messages.Updated'))->success();
 
@@ -104,8 +107,8 @@ class DepositController extends Controller
         try {
             $selectedData = $request->selectedData;
             foreach ($selectedData as $id) {
-                $deposit = Deposit::find($id);
-                $deposit->delete();
+                $delar = GoldDelar::find($id);
+                $delar->delete();
             }
             return Response()->json([
                 'status' => 'success',
@@ -123,10 +126,10 @@ class DepositController extends Controller
     {
 
         try {
-            $deposit = Deposit::findOrFail($id);
-            $deposit->delete();
+            $delar = GoldDelar::findOrFail($id);
+            $delar->delete();
 
-            if ($deposit) {
+            if ($delar) {
                 return response()->json([
                     'status' => 'success',
                     'message' => translate('messages.Deleted'),
