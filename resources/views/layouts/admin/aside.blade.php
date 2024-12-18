@@ -599,7 +599,7 @@
                     </div>
                 @endcan
 
-                @can(INVENTORY_MANAGEMENT_PERMISSION)
+                {{-- @can(INVENTORY_MANAGEMENT_PERMISSION)
                     <div data-kt-menu-trigger="click"
                         class="menu-item menu-accordion {{ hereShowRoutes(['inventories.index']) }}">
                         <!--begin:Menu link-->
@@ -643,7 +643,7 @@
 
                         <!--end:Menu sub-->
                     </div>
-                @endcan
+                @endcan --}}
 
                 @can(SETTINGS_MANAGEMENT_PERMISSION)
                     <div data-kt-menu-trigger="click"
